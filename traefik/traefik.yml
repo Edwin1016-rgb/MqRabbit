@@ -1,0 +1,13 @@
+api:
+  dashboard: true
+  insecure: true  # Solo para desarrollo local
+
+entryPoints:
+  web:
+    address: ":80"
+
+providers:
+  docker:
+    exposedByDefault: false
+log :
+  level: DEBUG 
