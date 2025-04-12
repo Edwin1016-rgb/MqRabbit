@@ -1,0 +1,72 @@
+version: '3.8'
+
+networks:
+  app_network:
+    driver: bridge
+
+volumes:
+  rabbitmq_data:
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"    # AMQP
+      - "15672:15672"  # Management UI
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+      - ./rabbitmq/definitions.json:/etc/rabbitmq/definitions.json
+    networks:
+      - app_network
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=password  # Cambia en producción
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+
+  api-analytics:
+    build: ./api-analytics
+    ports:
+      - "3000:3000"    # Para el panel-web
+    networks:
+      - app_network
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/reporte"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+
+  api-requests:
+    build: ./api-requests
+    ports:
+      - "4000:4000"    # Opcional (para endpoints HTTP)
+    environment:
+      - SERVICE_ID=api-requests
+      - RABBITMQ_URL=amqp://admin:password@rabbitmq:5672
+      - RABBITMQ_QUEUE=eventos_analytics
+    networks:
+      - app_network
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  panel-web:
+    build: ./panel-web
+    ports:
+      - "5000:5000"    # Acceso al panel
+    networks:
+      - app_network
+    depends_on:
+      - api-analytics
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/panel.web/status"]
+      interval: 10s
+      timeout: 30s
+      retries: 5

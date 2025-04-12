@@ -1,0 +1,5 @@
+{
+  "queues": [
+    {"name": "eventos_analytics", "durable": true}
+  ]
+}
