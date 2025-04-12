@@ -1,5 +1,3 @@
-version: '3.8'
-
 networks:
   app_network:
     driver: bridge
@@ -11,8 +9,8 @@ services:
   rabbitmq:
     image: rabbitmq:3-management
     ports:
-      - "5672:5672"    # AMQP
-      - "15672:15672"  # Management UI
+      - "5672:5672"    
+      - "15672:15672"  
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
       - ./rabbitmq/definitions.json:/etc/rabbitmq/definitions.json
@@ -20,7 +18,7 @@ services:
       - app_network
     environment:
       - RABBITMQ_DEFAULT_USER=admin
-      - RABBITMQ_DEFAULT_PASS=password  # Cambia en producción
+      - RABBITMQ_DEFAULT_PASS=password
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "ping"]
       interval: 5s
@@ -46,7 +44,7 @@ services:
   api-requests:
     build: ./api-requests
     ports:
-      - "4000:4000"    # Opcional (para endpoints HTTP)
+      - "4000:4000"    
     environment:
       - SERVICE_ID=api-requests
       - RABBITMQ_URL=amqp://admin:password@rabbitmq:5672
@@ -60,7 +58,7 @@ services:
   panel-web:
     build: ./panel-web
     ports:
-      - "5000:5000"    # Acceso al panel
+      - "5000:5000" 
     networks:
       - app_network
     depends_on:

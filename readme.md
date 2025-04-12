@@ -3,16 +3,12 @@ docker-compose up -d --build
 
 ## urls a probar
 
-http://localhost:8080/dashboard/#/http/routers
+http://localhost:15672/#/queues admin/password
 
-http://localhost/panel.Web
+http://localhost:5000/panel.web/status 
 
-http://localhost/cliente/uno
+http://localhost:3000/reporte
 
-http://localhost/cliente/dos
-
-http://localhost/api.registros/reporte
-
-http://localhost/api.registros/countRegisters
+http://localhost:5000/panel.web/status
 
 

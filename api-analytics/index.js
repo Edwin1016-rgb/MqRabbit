@@ -1,7 +1,7 @@
 const amqp = require('amqplib');
 const express = require('express');
 const app = express();
-const RETRY_DELAY = 5000; // 5 segundos entre reintentos
+const RETRY_DELAY = 5000;
 
 let registros = {};
 let channel = null;
@@ -11,7 +11,7 @@ async function connectToRabbit() {
   try {
     console.log('Conectando a RabbitMQ...');
     connection = await amqp.connect('amqp://admin:password@rabbitmq:5672', {
-      timeout: 10000 // 10 segundos de timeout
+      timeout: 10000 
     });
     
     console.log('Conexión RabbitMQ establecida');
@@ -31,19 +31,16 @@ async function connectToRabbit() {
     
   } catch (err) {
     console.error('Error de conexión RabbitMQ:', err.message);
-    // Reconexión automática
     setTimeout(connectToRabbit, RETRY_DELAY);
   }
 }
 
-// Manejo de cierre limpio
 process.on('SIGTERM', async () => {
   if (channel) await channel.close();
   if (connection) await connection.close();
   process.exit(0);
 });
 
-// Endpoint con chequeo de salud
 app.get('/reporte', (req, res) => {
   if (!channel) {
     return res.status(503).json({ 
@@ -54,7 +51,6 @@ app.get('/reporte', (req, res) => {
   res.json(registros);
 });
 
-// Inicio
 app.listen(3000, '0.0.0.0', () => {
   console.log('API Analytics escuchando en 3000');
   connectToRabbit();

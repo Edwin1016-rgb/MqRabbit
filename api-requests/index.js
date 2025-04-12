@@ -1,9 +1,8 @@
 const amqp = require('amqplib');
-const express = require('express');  // Solo si necesitas HTTP
+const express = require('express');
 const app = express();
 const SERVICE_ID = process.env.SERVICE_ID;
 
-// Publicador RabbitMQ
 async function publishMessage() {
   try {
     const conn = await amqp.connect(process.env.RABBITMQ_URL);
@@ -24,10 +23,8 @@ async function publishMessage() {
   }
 }
 
-// Publica cada 5 segundos
 setInterval(publishMessage, 5000);
 
-// Opcional: Endpoints HTTP (si los necesitas)
 app.get('/', (req, res) => {
   res.send(`Cliente ${SERVICE_ID} funcionando`);
 });
